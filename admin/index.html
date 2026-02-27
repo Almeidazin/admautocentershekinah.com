@@ -6,6 +6,7 @@
     <title>Painel Admin - Shekinah Auto Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* MANTÉM TODO O CSS QUE VOCÊ JÁ TEM */
         * {
             margin: 0;
             padding: 0;
@@ -441,6 +442,64 @@
             color: #ff4444;
         }
 
+        /* Categoria especial */
+        .category-select-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .category-select-wrapper select {
+            flex: 2;
+        }
+
+        .btn-add-category {
+            flex: 0.5;
+            background: #ffd700;
+            color: #0a0a0a;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-add-category:hover {
+            background: #ccac00;
+        }
+
+        .categories-list {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .category-tag {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-tag button {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .category-tag button:hover {
+            color: #ff0000;
+        }
+
         /* Responsivo */
         @media (max-width: 1024px) {
             .stats-grid {
@@ -490,9 +549,6 @@
             <li><a href="#dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="#products"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="#categories"><i class="fas fa-tags"></i> Categorias</a></li>
-            <li><a href="#orders"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="#appointments"><i class="fas fa-calendar"></i> Agendamentos</a></li>
-            <li><a href="#messages"><i class="fas fa-envelope"></i> Mensagens</a></li>
             <li><a href="#settings"><i class="fas fa-cog"></i> Configurações</a></li>
         </ul>
     </aside>
@@ -517,24 +573,6 @@
                 </div>
                 <div class="stat-icon">
                     <i class="fas fa-tags"></i>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Pedidos</h3>
-                    <span class="stat-number" id="totalOrders">0</span>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Agendamentos</h3>
-                    <span class="stat-number" id="totalAppointments">0</span>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-calendar"></i>
                 </div>
             </div>
         </div>
@@ -565,15 +603,26 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                <button class="btn-secondary" id="btnResetCatalog">
-                    <i class="fas fa-undo"></i> Resetar Catálogo Padrão
-                </button>
-                <button class="btn-secondary" id="btnExportCatalog">
-                    <i class="fas fa-download"></i> Exportar Catálogo
+        <!-- Seção de Categorias -->
+        <div class="admin-section" id="categories" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-tags"></i> Gerenciar Categorias</h2>
+                <button class="btn-primary" id="btnAddCategory">
+                    <i class="fas fa-plus"></i> Nova Categoria
                 </button>
             </div>
+
+            <div class="form-group">
+                <label for="newCategory">Nova Categoria</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="newCategory" placeholder="Ex: Pneus Esportivos" style="flex: 2;">
+                    <button class="btn-primary" id="saveCategoryBtn" style="flex: 0.5;">Adicionar</button>
+                </div>
+            </div>
+
+            <div class="categories-list" id="categoriesList"></div>
         </div>
 
         <!-- Seção de Configurações -->
@@ -627,10 +676,7 @@
                     <div class="form-group">
                         <label for="pCategory">Categoria *</label>
                         <select id="pCategory" required>
-                            <option value="Passeio">Passeio</option>
-                            <option value="SUV">SUV</option>
-                            <option value="Caminhonete">Caminhonete</option>
-                            <option value="Moto">Moto</option>
+                            <!-- Categorias serão carregadas aqui -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -689,6 +735,10 @@
 
         // ==================== CONFIGURAÇÕES ====================
         const LS_PRODUCTS = "shekinah_products";
+        const LS_CATEGORIES = "shekinah_categories";
+
+        // ==================== CATEGORIAS PADRÃO ====================
+        const defaultCategories = ["Passeio", "SUV", "Caminhonete", "Moto"];
 
         // ==================== PRODUTOS PADRÃO ====================
         const defaultProducts = [
@@ -744,6 +794,66 @@
                 .replaceAll(">", "&gt;")
                 .replaceAll('"', "&quot;")
                 .replaceAll("'", "&#039;");
+        };
+
+        // ==================== GERENCIAMENTO DE CATEGORIAS ====================
+        const getCategories = () => {
+            const stored = localStorage.getItem(LS_CATEGORIES);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch {
+                    return defaultCategories;
+                }
+            }
+            return defaultCategories;
+        };
+
+        const saveCategories = (categories) => {
+            localStorage.setItem(LS_CATEGORIES, JSON.stringify(categories));
+            renderCategoriesList();
+            updateCategorySelect();
+            updateStats();
+        };
+
+        const renderCategoriesList = () => {
+            const list = document.getElementById('categoriesList');
+            const categories = getCategories();
+            
+            list.innerHTML = categories.map(cat => `
+                <div class="category-tag">
+                    ${escapeHtml(cat)}
+                    <button onclick="deleteCategory('${escapeHtml(cat)}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        };
+
+        window.deleteCategory = (category) => {
+            if (confirm(`Tem certeza que deseja excluir a categoria "${category}"?`)) {
+                const categories = getCategories().filter(c => c !== category);
+                saveCategories(categories);
+                
+                // Atualizar produtos que usavam essa categoria para "Sem categoria"
+                const products = getProducts();
+                products.forEach(p => {
+                    if (p.category === category) {
+                        p.category = "Sem categoria";
+                    }
+                });
+                saveProducts(products);
+            }
+        };
+
+        const updateCategorySelect = () => {
+            const select = document.getElementById('pCategory');
+            if (!select) return;
+            
+            const categories = getCategories();
+            select.innerHTML = categories.map(cat => 
+                `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`
+            ).join('');
         };
 
         // ==================== GERENCIAMENTO DE PRODUTOS ====================
@@ -819,7 +929,9 @@
         // ==================== ATUALIZAR ESTATÍSTICAS ====================
         function updateStats() {
             const products = getProducts();
+            const categories = getCategories();
             document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('totalCategories').textContent = categories.length;
         }
 
         // ==================== CRUD DE PRODUTOS ====================
@@ -856,7 +968,7 @@
             editingId = null;
             document.getElementById('modalTitle').textContent = 'Adicionar Produto';
             document.getElementById('productForm').reset();
-            document.getElementById('pCategory').value = 'Passeio';
+            updateCategorySelect();
         }
 
         // ==================== MODAL ====================
@@ -923,26 +1035,28 @@
             alert(editingId ? 'Produto atualizado com sucesso!' : 'Produto adicionado com sucesso!');
         });
 
-        // ==================== RESETAR CATÁLOGO ====================
-        document.getElementById('btnResetCatalog').addEventListener('click', () => {
-            if (confirm('Isso irá substituir todos os produtos pelo catálogo padrão. Continuar?')) {
-                saveProducts(defaultProducts);
-                alert('Catálogo resetado com sucesso!');
-            }
+        // ==================== CATEGORIAS ====================
+        document.getElementById('btnAddCategory').addEventListener('click', () => {
+            document.getElementById('newCategory').focus();
         });
 
-        // ==================== EXPORTAR CATÁLOGO ====================
-        document.getElementById('btnExportCatalog').addEventListener('click', () => {
-            const products = getProducts();
-            const dataStr = JSON.stringify(products, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `shekinah-catalogo-${new Date().toISOString().slice(0,10)}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
+        document.getElementById('saveCategoryBtn').addEventListener('click', () => {
+            const newCategory = document.getElementById('newCategory').value.trim();
+            if (!newCategory) {
+                alert('Digite um nome para a categoria');
+                return;
+            }
+
+            const categories = getCategories();
+            if (categories.includes(newCategory)) {
+                alert('Esta categoria já existe!');
+                return;
+            }
+
+            categories.push(newCategory);
+            saveCategories(categories);
+            document.getElementById('newCategory').value = '';
+            alert('Categoria adicionada com sucesso!');
         });
 
         // ==================== NAVEGAÇÃO DAS ABAS ====================
@@ -961,12 +1075,19 @@
                 
                 if (targetId === 'dashboard') {
                     document.getElementById('products').style.display = 'block';
+                    document.getElementById('categories').style.display = 'none';
                     document.getElementById('settings').style.display = 'none';
                 } else if (targetId === 'products') {
                     document.getElementById('products').style.display = 'block';
+                    document.getElementById('categories').style.display = 'none';
+                    document.getElementById('settings').style.display = 'none';
+                } else if (targetId === 'categories') {
+                    document.getElementById('products').style.display = 'none';
+                    document.getElementById('categories').style.display = 'block';
                     document.getElementById('settings').style.display = 'none';
                 } else if (targetId === 'settings') {
                     document.getElementById('products').style.display = 'none';
+                    document.getElementById('categories').style.display = 'none';
                     document.getElementById('settings').style.display = 'block';
                 }
             });
@@ -980,6 +1101,15 @@
 
         // ==================== INICIALIZAÇÃO ====================
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar categorias
+            if (!localStorage.getItem(LS_CATEGORIES)) {
+                saveCategories(defaultCategories);
+            } else {
+                renderCategoriesList();
+                updateCategorySelect();
+            }
+
+            // Inicializar produtos
             if (!localStorage.getItem(LS_PRODUCTS)) {
                 saveProducts(defaultProducts);
             } else {
