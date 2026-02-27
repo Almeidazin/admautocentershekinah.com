@@ -181,9 +181,9 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            if (username === 'admin' && password === 'shekinah2026') {
+            if (username === 'admin' && password === 'Senha@shekinah') {
                 sessionStorage.setItem('admin_logged', 'true');
-                window.location.href = 'index.html';
+               window.location.href = 'dashboard.html';
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
             }
