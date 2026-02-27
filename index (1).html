@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Shekinah Auto Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* MANTÉM TODO O CSS QUE VOCÊ JÁ TEM */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        /* Header */
+        .admin-header {
+            background: #1a1a1a;
+            border-bottom: 2px solid #ffd700;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title h1 {
+            color: #ffd700;
+            font-size: 1.5rem;
+        }
+
+        .header-title p {
+            color: #b6b6b6;
+            font-size: 0.85rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #ffd700;
+            color: #0a0a0a;
+        }
+
+        .view-site {
+            background: #ffd700;
+            color: #0a0a0a;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-site:hover {
+            background: #ccac00;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 250px;
+            height: calc(100vh - 70px);
+            background: #1a1a1a;
+            border-right: 1px solid #333;
+            padding: 2rem 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: #b6b6b6;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border-left-color: #ffd700;
+        }
+
+        .sidebar-menu i {
+            width: 20px;
+        }
+
+        /* Main Content */
+        .admin-content {
+            margin-left: 250px;
+            margin-top: 70px;
+            padding: 2rem;
+        }
+
+        /* Cards de Estatísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-info h3 {
+            color: #b6b6b6;
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-info .stat-number {
+            color: #ffd700;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #ffd700;
+            opacity: 0.5;
+        }
+
+        /* Seções do Admin */
+        .admin-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .section-header h2 {
+            color: #ffd700;
+            font-size: 1.3rem;
+        }
+
+        .btn-primary {
+            background: #ffd700;
+            color: #0a0a0a;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: #ccac00;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #0a0a0a;
+        }
+
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #cc0000;
+        }
+
+        /* Tabelas */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            color: #ffd700;
+            border-bottom: 2px solid #ffd700;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+            color: #b6b6b6;
+        }
+
+        tr:hover td {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            background: #ffd700;
+            color: #0a0a0a;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #ff4444;
+            color: white;
+        }
+
+        /* Formulários */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        /* Status */
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .status-inactive {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .modal-header h2 {
+            color: #ffd700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #b6b6b6;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #ff4444;
+        }
+
+        /* Categoria especial */
+        .category-select-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .category-select-wrapper select {
+            flex: 2;
+        }
+
+        .btn-add-category {
+            flex: 0.5;
+            background: #ffd700;
+            color: #0a0a0a;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-add-category:hover {
+            background: #ccac00;
+        }
+
+        .categories-list {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .category-tag {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-tag button {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .category-tag button:hover {
+            color: #ff0000;
+        }
+
+        /* Responsivo */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                display: none;
+            }
+            
+            .admin-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-title">
+            <h1>Shekinah Auto Center</h1>
+            <p>Painel Administrativo</p>
+        </div>
+        <div class="header-actions">
+            <a href="../index.html" class="view-site" target="_blank">
+                <i class="fas fa-external-link-alt"></i> Ver Site
+            </a>
+            <button class="btn-logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="#dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="#products"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="#categories"><i class="fas fa-tags"></i> Categorias</a></li>
+            <li><a href="#settings"><i class="fas fa-cog"></i> Configurações</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total de Produtos</h3>
+                    <span class="stat-number" id="totalProducts">0</span>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Categorias</h3>
+                    <span class="stat-number" id="totalCategories">4</span>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Produtos -->
+        <div class="admin-section" id="products">
+            <div class="section-header">
+                <h2><i class="fas fa-box"></i> Gerenciar Produtos</h2>
+                <button class="btn-primary" id="btnAddProduct">
+                    <i class="fas fa-plus"></i> Novo Produto
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Categoria</th>
+                            <th>Preço</th>
+                            <th>Tags</th>
+                            <th>SKU</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <!-- Produtos serão inseridos aqui via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Seção de Categorias -->
+        <div class="admin-section" id="categories" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-tags"></i> Gerenciar Categorias</h2>
+                <button class="btn-primary" id="btnAddCategory">
+                    <i class="fas fa-plus"></i> Nova Categoria
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label for="newCategory">Nova Categoria</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="newCategory" placeholder="Ex: Pneus Esportivos" style="flex: 2;">
+                    <button class="btn-primary" id="saveCategoryBtn" style="flex: 0.5;">Adicionar</button>
+                </div>
+            </div>
+
+            <div class="categories-list" id="categoriesList"></div>
+        </div>
+
+        <!-- Seção de Configurações -->
+        <div class="admin-section" id="settings" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Configurações da Loja</h2>
+            </div>
+
+            <form id="settingsForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome da Loja</label>
+                        <input type="text" id="storeName" value="Shekinah Auto Center">
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp</label>
+                        <input type="text" id="storeWhatsApp" value="559293022416">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Endereço</label>
+                        <input type="text" id="storeAddress" value="Av Timbiras 447, Centro - Manaus/AM">
+                    </div>
+                    <div class="form-group">
+                        <label>Horário Seg-Sex</label>
+                        <input type="text" id="hourWeek" value="08:00 às 18:00">
+                    </div>
+                    <div class="form-group">
+                        <label>Horário Sábado</label>
+                        <input type="text" id="hourSat" value="08:00 às 12:00">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Modal de Produto -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Produto</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+
+            <form id="productForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pCategory">Categoria *</label>
+                        <select id="pCategory" required>
+                            <!-- Categorias serão carregadas aqui -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pPrice">Preço (R$) *</label>
+                        <input type="number" step="0.01" id="pPrice" placeholder="279.90" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pTitle">Título do Produto *</label>
+                    <input type="text" id="pTitle" placeholder="Ex: 175/70 R14 • Linha Econômica" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pDesc">Descrição</label>
+                    <textarea id="pDesc" placeholder="Descrição detalhada do produto"></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pTag1">Tag 1</label>
+                        <input type="text" id="pTag1" placeholder="⭐ 4,7">
+                    </div>
+                    <div class="form-group">
+                        <label for="pTag2">Tag 2</label>
+                        <input type="text" id="pTag2" placeholder="Baixo ruído">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pTag3">Tag 3</label>
+                        <input type="text" id="pTag3" placeholder="Molhado: bom">
+                    </div>
+                    <div class="form-group">
+                        <label for="pSku">SKU (Código)</label>
+                        <input type="text" id="pSku" placeholder="PNEU-1757014">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="saveProduct">
+                        <i class="fas fa-save"></i> Salvar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==================== VERIFICAÇÃO DE LOGIN ====================
+        if (!sessionStorage.getItem('admin_logged')) {
+            window.location.href = 'login.html';
+        }
+
+        // ==================== CONFIGURAÇÕES ====================
+        const LS_PRODUCTS = "shekinah_products";
+        const LS_CATEGORIES = "shekinah_categories";
+
+        // ==================== CATEGORIAS PADRÃO ====================
+        const defaultCategories = ["Passeio", "SUV", "Caminhonete", "Moto"];
+
+        // ==================== PRODUTOS PADRÃO ====================
+        const defaultProducts = [
+            {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                category: "Passeio",
+                title: "175/70 R14 • Linha Econômica",
+                desc: "Boa durabilidade e custo-benefício para uso urbano.",
+                price: 279.90,
+                tags: ["⭐ 4,7", "Baixo ruído", "Molhado: bom"],
+                sku: "PNEU-1757014"
+            },
+            {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                category: "SUV",
+                title: "215/60 R17 • Conforto & Silêncio",
+                desc: "Rodagem macia, menor ruído e ótima estabilidade.",
+                price: 489.90,
+                tags: ["⭐ 4,8", "Conforto", "Economia"],
+                sku: "PNEU-2156017"
+            },
+            {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                category: "Caminhonete",
+                title: "265/70 R16 • All Terrain",
+                desc: "Estrada e off-road leve, com ótima tração.",
+                price: 699.90,
+                tags: ["⭐ 4,6", "Tração", "Resistente"],
+                sku: "PNEU-2657016"
+            },
+            {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                category: "Moto",
+                title: "90/90-18 • Urbano",
+                desc: "Boa aderência no seco e no molhado para o dia a dia.",
+                price: 159.90,
+                tags: ["⭐ 4,5", "Aderência", "Controle"],
+                sku: "PNEU-909018"
+            }
+        ];
+
+        // ==================== UTILITÁRIOS ====================
+        const formatBRL = (n) => {
+            const v = Number(n);
+            if (!Number.isFinite(v)) return "R$ 0,00";
+            return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        };
+
+        const escapeHtml = (str) => {
+            return String(str ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        };
+
+        // ==================== GERENCIAMENTO DE CATEGORIAS ====================
+        const getCategories = () => {
+            const stored = localStorage.getItem(LS_CATEGORIES);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch {
+                    return defaultCategories;
+                }
+            }
+            return defaultCategories;
+        };
+
+        const saveCategories = (categories) => {
+            localStorage.setItem(LS_CATEGORIES, JSON.stringify(categories));
+            renderCategoriesList();
+            updateCategorySelect();
+            updateStats();
+        };
+
+        const renderCategoriesList = () => {
+            const list = document.getElementById('categoriesList');
+            const categories = getCategories();
+            
+            list.innerHTML = categories.map(cat => `
+                <div class="category-tag">
+                    ${escapeHtml(cat)}
+                    <button onclick="deleteCategory('${escapeHtml(cat)}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        };
+
+        window.deleteCategory = (category) => {
+            if (confirm(`Tem certeza que deseja excluir a categoria "${category}"?`)) {
+                const categories = getCategories().filter(c => c !== category);
+                saveCategories(categories);
+                
+                // Atualizar produtos que usavam essa categoria para "Sem categoria"
+                const products = getProducts();
+                products.forEach(p => {
+                    if (p.category === category) {
+                        p.category = "Sem categoria";
+                    }
+                });
+                saveProducts(products);
+            }
+        };
+
+        const updateCategorySelect = () => {
+            const select = document.getElementById('pCategory');
+            if (!select) return;
+            
+            const categories = getCategories();
+            select.innerHTML = categories.map(cat => 
+                `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`
+            ).join('');
+        };
+
+        // ==================== GERENCIAMENTO DE PRODUTOS ====================
+        const getProducts = () => {
+            const stored = localStorage.getItem(LS_PRODUCTS);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch {
+                    return defaultProducts;
+                }
+            }
+            return defaultProducts;
+        };
+
+        const saveProducts = (products) => {
+            localStorage.setItem(LS_PRODUCTS, JSON.stringify(products));
+            renderProductsTable();
+            updateStats();
+        };
+
+        // ==================== RENDERIZAR TABELA ====================
+        function renderProductsTable() {
+            const tbody = document.getElementById('productsTableBody');
+            const products = getProducts();
+
+            if (products.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: #b6b6b6;">
+                            Nenhum produto encontrado. Clique em "Novo Produto" para adicionar.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="product-thumb">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div>
+                                <strong style="color: #fff;">${escapeHtml(p.title)}</strong><br>
+                                <small style="color: #b6b6b6;">${escapeHtml(p.desc.substring(0, 50))}...</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge status-active">${escapeHtml(p.category)}</span></td>
+                    <td><strong style="color: #ffd700;">${formatBRL(p.price)}</strong></td>
+                    <td>
+                        ${(p.tags || []).map(t => 
+                            `<span style="background: #333; padding: 0.2rem 0.5rem; border-radius: 5px; margin-right: 0.3rem; font-size: 0.8rem;">${escapeHtml(t)}</span>`
+                        ).join('')}
+                    </td>
+                    <td><span style="color: #b6b6b6;">${escapeHtml(p.sku || '—')}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editProduct('${p.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteProduct('${p.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ==================== ATUALIZAR ESTATÍSTICAS ====================
+        function updateStats() {
+            const products = getProducts();
+            const categories = getCategories();
+            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('totalCategories').textContent = categories.length;
+        }
+
+        // ==================== CRUD DE PRODUTOS ====================
+        let editingId = null;
+
+        window.editProduct = (id) => {
+            const products = getProducts();
+            const product = products.find(p => p.id === id);
+            
+            if (product) {
+                editingId = id;
+                document.getElementById('modalTitle').textContent = 'Editar Produto';
+                document.getElementById('pCategory').value = product.category;
+                document.getElementById('pPrice').value = product.price;
+                document.getElementById('pTitle').value = product.title;
+                document.getElementById('pDesc').value = product.desc;
+                document.getElementById('pTag1').value = product.tags[0] || '';
+                document.getElementById('pTag2').value = product.tags[1] || '';
+                document.getElementById('pTag3').value = product.tags[2] || '';
+                document.getElementById('pSku').value = product.sku || '';
+                
+                document.getElementById('productModal').classList.add('active');
+            }
+        };
+
+        window.deleteProduct = (id) => {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                const products = getProducts().filter(p => p.id !== id);
+                saveProducts(products);
+            }
+        };
+
+        function resetProductForm() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Adicionar Produto';
+            document.getElementById('productForm').reset();
+            updateCategorySelect();
+        }
+
+        // ==================== MODAL ====================
+        const modal = document.getElementById('productModal');
+        
+        document.getElementById('btnAddProduct').addEventListener('click', () => {
+            resetProductForm();
+            modal.classList.add('active');
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        document.getElementById('cancelModal').addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // ==================== SALVAR PRODUTO ====================
+        document.getElementById('productForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('pTitle').value.trim();
+            const price = parseFloat(document.getElementById('pPrice').value);
+            
+            if (!title || isNaN(price) || price <= 0) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            const product = {
+                id: editingId || Date.now().toString(36) + Math.random().toString(36).substr(2),
+                category: document.getElementById('pCategory').value,
+                title: title,
+                desc: document.getElementById('pDesc').value.trim() || 'Sem descrição',
+                price: price,
+                tags: [
+                    document.getElementById('pTag1').value.trim(),
+                    document.getElementById('pTag2').value.trim(),
+                    document.getElementById('pTag3').value.trim()
+                ].filter(Boolean),
+                sku: document.getElementById('pSku').value.trim()
+            };
+
+            const products = getProducts();
+            
+            if (editingId) {
+                const index = products.findIndex(p => p.id === editingId);
+                if (index !== -1) {
+                    products[index] = product;
+                }
+            } else {
+                products.unshift(product);
+            }
+
+            saveProducts(products);
+            modal.classList.remove('active');
+            alert(editingId ? 'Produto atualizado com sucesso!' : 'Produto adicionado com sucesso!');
+        });
+
+        // ==================== CATEGORIAS ====================
+        document.getElementById('btnAddCategory').addEventListener('click', () => {
+            document.getElementById('newCategory').focus();
+        });
+
+        document.getElementById('saveCategoryBtn').addEventListener('click', () => {
+            const newCategory = document.getElementById('newCategory').value.trim();
+            if (!newCategory) {
+                alert('Digite um nome para a categoria');
+                return;
+            }
+
+            const categories = getCategories();
+            if (categories.includes(newCategory)) {
+                alert('Esta categoria já existe!');
+                return;
+            }
+
+            categories.push(newCategory);
+            saveCategories(categories);
+            document.getElementById('newCategory').value = '';
+            alert('Categoria adicionada com sucesso!');
+        });
+
+        // ==================== NAVEGAÇÃO DAS ABAS ====================
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                const targetId = link.getAttribute('href').substring(1);
+                
+                document.querySelectorAll('.admin-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                if (targetId === 'dashboard') {
+                    document.getElementById('products').style.display = 'block';
+                    document.getElementById('categories').style.display = 'none';
+                    document.getElementById('settings').style.display = 'none';
+                } else if (targetId === 'products') {
+                    document.getElementById('products').style.display = 'block';
+                    document.getElementById('categories').style.display = 'none';
+                    document.getElementById('settings').style.display = 'none';
+                } else if (targetId === 'categories') {
+                    document.getElementById('products').style.display = 'none';
+                    document.getElementById('categories').style.display = 'block';
+                    document.getElementById('settings').style.display = 'none';
+                } else if (targetId === 'settings') {
+                    document.getElementById('products').style.display = 'none';
+                    document.getElementById('categories').style.display = 'none';
+                    document.getElementById('settings').style.display = 'block';
+                }
+            });
+        });
+
+        // ==================== LOGOUT ====================
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('admin_logged');
+            window.location.href = 'login.html';
+        });
+
+        // ==================== INICIALIZAÇÃO ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar categorias
+            if (!localStorage.getItem(LS_CATEGORIES)) {
+                saveCategories(defaultCategories);
+            } else {
+                renderCategoriesList();
+                updateCategorySelect();
+            }
+
+            // Inicializar produtos
+            if (!localStorage.getItem(LS_PRODUCTS)) {
+                saveProducts(defaultProducts);
+            } else {
+                renderProductsTable();
+                updateStats();
+            }
+
+            // Carregar configurações salvas
+            const savedSettings = localStorage.getItem('store_settings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                document.getElementById('storeName').value = settings.name || 'Shekinah Auto Center';
+                document.getElementById('storeWhatsApp').value = settings.whatsapp || '559293022416';
+                document.getElementById('storeAddress').value = settings.address || 'Av Timbiras 447, Centro - Manaus/AM';
+                document.getElementById('hourWeek').value = settings.hourWeek || '08:00 às 18:00';
+                document.getElementById('hourSat').value = settings.hourSat || '08:00 às 12:00';
+            }
+        });
+
+        // Salvar configurações
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const settings = {
+                name: document.getElementById('storeName').value,
+                whatsapp: document.getElementById('storeWhatsApp').value,
+                address: document.getElementById('storeAddress').value,
+                hourWeek: document.getElementById('hourWeek').value,
+                hourSat: document.getElementById('hourSat').value
+            };
+            
+            localStorage.setItem('store_settings', JSON.stringify(settings));
+            alert('Configurações salvas com sucesso!');
+        });
+    </script>
+</body>
+</html>
